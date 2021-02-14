@@ -1,23 +1,25 @@
 
 # installation instructions for the short-attention-span user like me
+# this will allow you to edit code in ~/aprsd-dev and immediately run it
+# there are at least 6.7 other ways to install this, including pypy
 
-mkdir -p ~/.aprsd
 
 cd ~
-virtualenv .venv_aprsd
+virtualenv --python=/usr/bin/python3 .venv_aprsd
 cd .venv_aprsd/
 source ./bin/activate
 
-mkdir ~/aprsd2
-cd ~/aprsd2
+mkdir ~/aprsd-dev && cd ~/aprsd-dev
 git clone https://github.com/craigerl/aprsd.git
 cd aprsd
+git checkout tags/v1.6.0
 pip install -e .
 cd ~/.venv_aprsd/bin
 
-./aprsd sample-config    # generates a config.yml template
+./aprsd sample-config    # view sample config.yml template
+#./aprsd sample-config > ~/.config/aprsd/aprsd.yml   # generates a config.yml template
 
-vi ~/.config/aprsd/config.yml   # copy/edit config here
+vi ~/.config/aprsd/aprsd.yml   # copy/edit config here
 
 ./aprsd server
 
