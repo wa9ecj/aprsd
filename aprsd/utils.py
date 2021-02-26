@@ -27,6 +27,11 @@ DEFAULT_CONFIG_DICT = {
         "host": "rotate.aprs2.net",
         "port": 14580,
     },
+    "kiss": {
+        "host": "direwolf.ip.address",
+        "port": "8001",
+        "enabled": False,
+    },
     "aprsd": {
         "logfile": "/tmp/aprsd.log",
         "logformat": DEFAULT_LOG_FORMAT,

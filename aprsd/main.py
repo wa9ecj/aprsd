@@ -32,7 +32,18 @@ import time
 
 # local imports here
 import aprsd
-from aprsd import client, email, flask, messaging, plugin, stats, threads, trace, utils
+from aprsd import (
+    client,
+    email,
+    flask,
+    kissclient,
+    messaging,
+    plugin,
+    stats,
+    threads,
+    trace,
+    utils,
+)
 import aprslib
 from aprslib.exceptions import LoginError
 import click
@@ -459,18 +470,35 @@ def server(
         LOG.debug("Loading saved MsgTrack object.")
         messaging.MsgTrack().load()
 
+    LOG.debug("CREATING Qs")
     rx_msg_queue = queue.Queue(maxsize=20)
     tx_msg_queue = queue.Queue(maxsize=20)
     msg_queues = {"rx": rx_msg_queue, "tx": tx_msg_queue}
 
-    rx_thread = threads.APRSDRXThread(msg_queues=msg_queues, config=config)
+    LOG.debug("Create Threads rx/tx")
+    aprsrx_thread = threads.APRSDRXThread(msg_queues=msg_queues, config=config)
     tx_thread = threads.APRSDTXThread(msg_queues=msg_queues, config=config)
+
+    LOG.debug("KISS?!?!?!?!?!?!?")
+    if config["kiss"].get("enabled", False):
+        # Kiss interface is enabled
+        LOG.debug(
+            "Kiss enabled to {}:{}".format(
+                config["kiss"]["host"],
+                config["kiss"]["port"],
+            ),
+        )
+        kcl = kissclient.KISSClient(config=config)
+        kcl.client
+
+        kissrx_thread = threads.KISSRXThread(msg_queues=msg_queues, config=config)
+        kissrx_thread.start()
 
     if email_enabled:
         email_thread = email.APRSDEmailThread(msg_queues=msg_queues, config=config)
         email_thread.start()
 
-    rx_thread.start()
+    aprsrx_thread.start()
     tx_thread.start()
 
     messaging.MsgTrack().restart()
